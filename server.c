@@ -124,7 +124,6 @@ void handle_read(connection_t *conn, int epoll_fd)
 
                 
                 thread_pool_add_task(process_request, conn);
-                free(task);
 
                 break; // hand off to worker, stop reading
             }
@@ -240,7 +239,6 @@ void process_request(void *args)
 {
     connection_t *conn    = (connection_t *)args;
     int           client_fd = conn->fd;
-    free(task); // free the wrapper, conn lives on
 
     printf("thread %lu processing request:\n%s\n", pthread_self(), conn->read_buffer);
 
