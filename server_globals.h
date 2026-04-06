@@ -13,7 +13,7 @@ static inline void signal_main_loop(void)
 {
     uint64_t val = 1;
     if (write(g_eventfd, &val, sizeof(val)) < 0 && errno != EAGAIN)
-        perror("eventfd write");
+        // perror("eventfd write");
 }
 
 #endif

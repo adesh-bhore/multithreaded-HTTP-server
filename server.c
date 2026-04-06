@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 #include <sys/epoll.h>
 #include <fcntl.h>
+ #include <sys/stat.h>
 #include <errno.h>
 #include <sys/sendfile.h>
 #include <sys/eventfd.h>
@@ -238,7 +239,10 @@ void process_request(void *args)
         strncpy(conn->write_buffer, resp, sizeof(conn->write_buffer) - 1);
         conn->write_sent = 0;
         conn->state = STATE_WRITING;
-        goto signal_epoll; // still need to signal main loop
+
+        if (done_queue_push(&g_done_queue, conn) == 0)
+            signal_main_loop();
+        return;
     }
 
     normalize_path(path);
@@ -315,6 +319,23 @@ done:
     }
 
 }
+}
+
+void conn_destroy(connection_t *conn, int epoll_fd)
+{
+    epoll_ctl(epoll_fd, EPOLL_CTL_DEL, conn->fd, NULL);
+    close(conn->fd);
+
+    if (conn->timer_fd > 0)
+    {
+        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, conn->timer_fd, NULL);
+        close(conn->timer_fd);
+    }
+
+    if (conn->file_fd > 0)
+        close(conn->file_fd);
+
+    free(conn);
 }
 
 
