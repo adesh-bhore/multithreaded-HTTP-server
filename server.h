@@ -13,6 +13,13 @@
 #define MAX_EVENTS 1024
 #define PORT 8080
 
+typedef enum
+{
+    STATE_READING,
+    STATE_WRITING,
+    STATE_PROCESSING,
+    STATE_DONE
+} conn_state_t;
 
 typedef struct
 {
