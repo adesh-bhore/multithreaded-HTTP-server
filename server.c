@@ -1,3 +1,8 @@
+#include "server.h"
+#include "server_supporting.h"
+#include "server_globals.h"
+#include "thread_pool.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,13 +10,9 @@
 #include <arpa/inet.h>
 #include <sys/epoll.h>
 #include <fcntl.h>
-#include "thread_pool.h"
 #include <errno.h>
 #include <sys/sendfile.h>
-#include "server_supporting.h"
-#include "server_globals.h"
 #include <sys/eventfd.h>
-
 
 #define MAX_EVENTS 1024
 
@@ -21,39 +22,6 @@
 done_queue_t g_done_queue;
 int          g_eventfd;
 
-// adding connection handling task to thread pool
-typedef enum
-{
-    STATE_READING,
-    STATE_WRITING,
-    STATE_PROCESSING,
-    STATE_DONE
-} conn_state_t;
-
-typedef struct
-{
-    int fd;
-    conn_state_t state;
-
-    char read_buffer[8192];
-    char write_buffer[4096];
-
-    int read_len;
-    int write_len;
-    int write_sent;
-
-    int file_fd;       // for sendfile
-    off_t file_size;   // for sendfile
-    off_t file_offset; // for sendfile
-
-    int keep_alive;
-} connection_t;
-
-typedef struct
-{
-    connection_t *conn;
-    int epoll_fd;
-} request_task_t; // make separate struct for conn and epoll for process req
 
 // parsing http req to get path and dynamically sending the file content using sendfile for zero-copy optimization
 

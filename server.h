@@ -56,3 +56,4 @@ void handle_read(connection_t *conn, int epoll_fd);
 void handle_write(connection_t *conn, int epoll_fd);
 void process_request(void *args);
 
+#endif // SERVER_H
