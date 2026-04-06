@@ -40,6 +40,30 @@ void normalize_path(char *path)
     {
         strcpy(path, "/index.html");
     }
+
+    const char *last_slash = strrchr(path, '/');
+    const char *last_dot   = strrchr(path, '.');
+
+    if (last_dot == NULL || last_dot < last_slash)
+    {
+        // no extension found — try appending .html
+        char candidate[512];
+        snprintf(candidate, sizeof(candidate), "./www%s.html", path);
+
+        if (access(candidate, F_OK) == 0)
+        {
+            // file exists with .html — rewrite path
+            strncat(path, ".html", 255 - strlen(path));
+            return;
+        }
+
+         snprintf(candidate, sizeof(candidate), "./www%s/index.html", path);
+        if (access(candidate, F_OK) == 0)
+        {
+            strncat(path,  "/index.html", 255 - strlen(path));
+            return;
+        }
+    }
 }
 
 const char *get_mime_type(const char *path)
