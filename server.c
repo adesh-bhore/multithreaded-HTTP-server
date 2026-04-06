@@ -321,6 +321,17 @@ done:
 }
 }
 
+void conn_destroy(connection_t *conn, int epoll_fd)
+{
+    epoll_ctl(epoll_fd, EPOLL_CTL_DEL, conn->fd, NULL);
+    close(conn->fd);
+
+    if (conn->file_fd > 0)
+        close(conn->file_fd);
+
+    free(conn);
+}
+
 
 int main(void)
 {
