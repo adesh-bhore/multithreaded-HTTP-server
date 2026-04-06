@@ -152,28 +152,28 @@ void example_task(void *arg)
     free(arg);
 }
 
-int main()
-{
-    thread_pool_init();
+// int main()
+// {
+//     thread_pool_init();
 
-    char input;
-    int task_id = 0;
+//     char input;
+//     int task_id = 0;
 
-    printf("Press 'a' to add task, 'q' to quit\n");
+//     printf("Press 'a' to add task, 'q' to quit\n");
 
-    while ((input = getchar()) != 'q')
-    {
-        if (input == 'a')
-        {
-            int *num = (int *)malloc(sizeof(int));
-            *num = task_id++;
-            thread_pool_add_task(example_task, num);
-            printf("Task %d added\n", *(int *)num);
-        }
-        // Add small delay to avoid input buffer issues
-        usleep(10000);
-    }
+//     while ((input = getchar()) != 'q')
+//     {
+//         if (input == 'a')
+//         {
+//             int *num = (int *)malloc(sizeof(int));
+//             *num = task_id++;
+//             thread_pool_add_task(example_task, num);
+//             printf("Task %d added\n", *(int *)num);
+//         }
+//         // Add small delay to avoid input buffer issues
+//         usleep(10000);
+//     }
 
-    thread_pool_destroy();
-    return 0;
-}
+//     thread_pool_destroy();
+//     return 0;
+// }
