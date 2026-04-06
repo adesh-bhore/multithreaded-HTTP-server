@@ -122,10 +122,8 @@ void handle_read(connection_t *conn, int epoll_fd)
 
                 conn->state = STATE_PROCESSING;
 
-                request_task_t *task = malloc(sizeof(request_task_t));
-                task->conn = conn;
-                task->epoll_fd = epoll_fd;
-                thread_pool_add_task(process_request, task);
+                
+                thread_pool_add_task(process_request, conn);
                 free(task);
 
                 break; // hand off to worker, stop reading
@@ -240,10 +238,8 @@ void handle_write(connection_t *conn, int epoll_fd)
 
 void process_request(void *args)
 {
-    request_task_t *task = (request_task_t *)args;
-    connection_t *conn = task->conn;
-    int epoll_fd = task->epoll_fd;
-    int client_fd = conn->fd;
+    connection_t *conn    = (connection_t *)args;
+    int           client_fd = conn->fd;
     free(task); // free the wrapper, conn lives on
 
     printf("thread %lu processing request:\n%s\n", pthread_self(), conn->read_buffer);
